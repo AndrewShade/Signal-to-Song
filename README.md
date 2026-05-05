@@ -38,12 +38,39 @@ One of the biggest challenges in recommendation is the Filter Bubble. Signal to 
 
 <img src="assets/example.gif" width="70%">
 
+
+## Data Acquisition
+This project is built to interface with the **Spotify tracks and audio features** dataset hosted by Anna’s Archive. Because the raw dataset consists of over 45 million records, it is not included in this repository.
+
+To use this application, you must:
+1. Locate and download the Spotify metadata and features SQLite files from Anna’s Archive.
+2. Place the raw data files in a directory of your choice.
+3. Update the `SPOTIFY_DATA_BASE_PATH` in your `.env` file to point to that directory.
+4. Run the `data_pipeline.py` script to generate the vector vault.
+
+Please note that the initial migration and vectorization process may take several hours depending on your hardware due to the scale of the 12 dimensional feature space.
+
 ## Installation and Setup
 To get started, clone the repository and install the dependencies.
 
 `pip install -r requirements.txt`
 
 You will also need to have your local LanceDB instance populated using the provided data pipeline script. Ensure your .env file is configured with your Spotify API credentials and your local data base path.
+
+## Configuration
+
+The application relies on environment variables for authentication and local data discovery. Create a file named `.env` in the root directory and populate it with your own credentials.
+
+
+```text
+# Spotify Developer Credentials
+SPOTIPY_CLIENT_ID='your_client_id_here'
+SPOTIPY_CLIENT_SECRET='your_client_secret_here'
+SPOTIPY_REDIRECT_URI='[http://127.0.0.1:8888/callback](http://127.0.0.1:8888/callback)'
+
+# Local Data Paths
+SPOTIFY_DATA_BASE_PATH='path/to/your/annas/archive/folder'
+```
 
 ## Future Roadmap
 This project is an ongoing exploration of high scale vector search. Future updates will focus on the following areas.
