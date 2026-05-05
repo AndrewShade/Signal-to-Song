@@ -1,0 +1,7 @@
+spotipy
+lancedb
+pandas
+numpy
+tqdm
+python-dotenv
+streamlit
