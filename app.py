@@ -19,7 +19,15 @@ st.set_page_config(page_title="Signal to Song", layout="wide")
 
 @st.cache_resource
 def get_vector_table():
-    """Establishes connection to the local 45M track vector vault."""
+    """
+    Opens the local LanceDB vector vault.
+    Raises RuntimeError with setup instructions if the vault has not been built yet.
+    """
+    if not os.path.exists(VECTOR_DB_PATH):
+        raise RuntimeError(
+            f"Vector vault not found at '{VECTOR_DB_PATH}'. "
+            "Run data_pipeline.py first to build it."
+        )
     db = lancedb.connect(VECTOR_DB_PATH)
     return db.open_table("tracks")
 
@@ -39,21 +47,29 @@ def fetch_top_tracks(sp, time_range="medium_term", limit=20):
     """Retrieves user listening history for the selected time horizon."""
     results = sp.current_user_top_tracks(limit=limit, time_range=time_range)
     return [
-        {"id": t["id"], "name": t["name"], "artist": t["artists"][0]["name"]} 
+        {
+            "id": t["id"],
+            "name": t["name"],
+            "artist": t["artists"][0]["name"] if t.get("artists") else "Unknown Artist",
+        }
         for t in results["items"]
     ]
 
 def fetch_playlist_tracks(sp, playlist_url, limit=20):
-    """Parses playlist URLs or IDs to retrieve seed track metadata."""
+    """Parses a Spotify playlist URL or bare ID and returns seed track metadata."""
     if "playlist/" in playlist_url:
         playlist_id = playlist_url.split("playlist/")[1].split("?")[0]
     else:
         playlist_id = playlist_url
-        
+
     results = sp.playlist_tracks(playlist_id, limit=limit)
     return [
-        {"id": t["track"]["id"], "name": t["track"]["name"], "artist": t["track"]["artists"][0]["name"]} 
-        for t in results["items"] if t["track"]
+        {
+            "id": t["track"]["id"],
+            "name": t["track"]["name"],
+            "artist": t["track"]["artists"][0]["name"] if t["track"].get("artists") else "Unknown Artist",
+        }
+        for t in results["items"] if t.get("track")
     ]
 
 # --- RECOMMENDATION ENGINE ---
@@ -179,7 +195,11 @@ if generate_clicked:
             else:
                 st.warning("No matches found within selected constraints.")
                 
+    except spotipy.SpotifyException as error:
+        st.error(f"Spotify API error: {error}. Check your credentials in `.env`.")
+    except RuntimeError as error:
+        st.error(f"Local vault error: {error}")
     except Exception as error:
-        st.error(f"Search failed: {error}")
+        st.error(f"Unexpected error: {error}")
 else:
     st.info("Tune your parameters in the sidebar to search the local 45M track vault.")

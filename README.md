@@ -51,11 +51,19 @@ To use this application, you must:
 Please note that the initial migration and vectorization process may take several hours depending on your hardware due to the scale of the 12 dimensional feature space.
 
 ## Installation and Setup
-To get started, clone the repository and install the dependencies.
+Requires **Python 3.10+**. Clone the repository and install the dependencies.
 
-`pip install -r requirements.txt`
+```bash
+pip install -r requirements.txt
+```
 
-You will also need to have your local LanceDB instance populated using the provided data pipeline script. Ensure your .env file is configured with your Spotify API credentials and your local data base path.
+Once your `.env` is configured and the data pipeline has completed, launch the dashboard:
+
+```bash
+streamlit run app.py
+```
+
+You will also need to have your local LanceDB instance populated using the provided data pipeline script. Ensure your `.env` file is configured with your Spotify API credentials and your local data path before running either script.
 
 ## Configuration
 
@@ -66,7 +74,7 @@ The application relies on environment variables for authentication and local dat
 # Spotify Developer Credentials
 SPOTIPY_CLIENT_ID='your_client_id_here'
 SPOTIPY_CLIENT_SECRET='your_client_secret_here'
-SPOTIPY_REDIRECT_URI='[http://127.0.0.1:8888/callback](http://127.0.0.1:8888/callback)'
+SPOTIPY_REDIRECT_URI='http://127.0.0.1:8888/callback'
 
 # Local Data Paths
 SPOTIFY_DATA_BASE_PATH='path/to/your/annas/archive/folder'
